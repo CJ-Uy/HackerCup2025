@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { FaEye, FaEyeSlash } from "react-icons/fa6";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -18,13 +19,10 @@ import {
 import { Input } from "@/components/ui/input";
 
 const formSchema = z.object({
-	firstName: z.string().min(2, "First name must be at least 2 characters."),
-	lastName: z.string().min(2, "Last name must be at least 2 characters."),
-	username: z.string().min(2, "Username must be at least 2 characters."),
+	firstName: z.string().min(1, "First name is required."),
+	lastName: z.string().min(1, "Last name is required."),
 	email: z.string().email("Please enter a valid email."),
 	password: z.string().min(6, "Password must be at least 6 characters."),
-	// Making phone optional as per your Prisma schema
-	phone: z.string().optional().or(z.literal("")),
 });
 
 interface SignUpFormProps {
@@ -35,57 +33,92 @@ interface SignUpFormProps {
 export function SignUpForm({ onSuccess, onSwitchToLogin }: SignUpFormProps) {
 	const supabase = createClient();
 	const [error, setError] = useState<string | null>(null);
+	const [isLoading, setIsLoading] = useState(false);
+	const [showPassword, setShowPassword] = useState(false);
 
 	const form = useForm<z.infer<typeof formSchema>>({
 		resolver: zodResolver(formSchema),
 		defaultValues: {
 			firstName: "",
 			lastName: "",
-			username: "",
 			email: "",
 			password: "",
-			phone: "",
 		},
 	});
 
 	async function onSubmit(values: z.infer<typeof formSchema>) {
+		setIsLoading(true);
 		setError(null);
 
-		// Pass additional data to the `options.data` property
-		const { data, error } = await supabase.auth.signUp({
+		const { error } = await supabase.auth.signUp({
 			email: values.email,
 			password: values.password,
 			options: {
 				data: {
-					first_name: values.firstName, // Use snake_case for custom metadata
+					first_name: values.firstName,
 					last_name: values.lastName,
-					username: values.username,
-					phone: values.phone,
 				},
 			},
 		});
 
+		setIsLoading(false);
 		if (error) {
 			setError(error.message);
 			return;
 		}
 
+		// A better UX would be to show a "Check your email" message
 		form.reset();
-		onSuccess(); // Close modal on success
+		onSuccess();
 	}
 
 	return (
-		<Form {...form}>
-			<form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-				<div className="grid grid-cols-2 gap-4">
+		<div className="w-full max-w-sm">
+			{/* Header */}
+			<div className="mb-8 text-center">
+				<h1 className="mb-2 text-4xl font-extrabold text-gray-900">KLUTCH</h1>
+				<p className="text-lg text-gray-600">Create your free account</p>
+			</div>
+
+			<Form {...form}>
+				<form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
+					<div className="grid grid-cols-2 gap-4">
+						<FormField
+							control={form.control}
+							name="firstName"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel className="font-semibold">First Name</FormLabel>
+									<FormControl>
+										<Input placeholder="John" {...field} className="h-11" />
+									</FormControl>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+						<FormField
+							control={form.control}
+							name="lastName"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel className="font-semibold">Last Name</FormLabel>
+									<FormControl>
+										<Input placeholder="Doe" {...field} className="h-11" />
+									</FormControl>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+					</div>
+
 					<FormField
 						control={form.control}
-						name="firstName"
+						name="email"
 						render={({ field }) => (
 							<FormItem>
-								<FormLabel>First Name</FormLabel>
+								<FormLabel className="font-semibold">Email Address</FormLabel>
 								<FormControl>
-									<Input placeholder="John" {...field} />
+									<Input placeholder="Enter your email" {...field} className="h-11" />
 								</FormControl>
 								<FormMessage />
 							</FormItem>
@@ -93,89 +126,58 @@ export function SignUpForm({ onSuccess, onSwitchToLogin }: SignUpFormProps) {
 					/>
 					<FormField
 						control={form.control}
-						name="lastName"
+						name="password"
 						render={({ field }) => (
 							<FormItem>
-								<FormLabel>Last Name</FormLabel>
+								<FormLabel className="font-semibold">Password</FormLabel>
 								<FormControl>
-									<Input placeholder="Doe" {...field} />
+									<div className="relative">
+										<Input
+											type={showPassword ? "text" : "password"}
+											placeholder="Enter your password"
+											{...field}
+											className="h-11 pr-10"
+										/>
+										<button
+											type="button"
+											className="absolute inset-y-0 right-0 flex items-center pr-3"
+											onClick={() => setShowPassword(!showPassword)}
+										>
+											{showPassword ? (
+												<FaEyeSlash className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+											) : (
+												<FaEye className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+											)}
+										</button>
+									</div>
 								</FormControl>
 								<FormMessage />
 							</FormItem>
 						)}
 					/>
-				</div>
 
-				<FormField
-					control={form.control}
-					name="username"
-					render={({ field }) => (
-						<FormItem>
-							<FormLabel>Username</FormLabel>
-							<FormControl>
-								<Input placeholder="your_username" {...field} />
-							</FormControl>
-							<FormMessage />
-						</FormItem>
-					)}
-				/>
-				<FormField
-					control={form.control}
-					name="email"
-					render={({ field }) => (
-						<FormItem>
-							<FormLabel>Email</FormLabel>
-							<FormControl>
-								<Input placeholder="you@example.com" {...field} />
-							</FormControl>
-							<FormMessage />
-						</FormItem>
-					)}
-				/>
-				<FormField
-					control={form.control}
-					name="phone"
-					render={({ field }) => (
-						<FormItem>
-							<FormLabel>Phone (Optional)</FormLabel>
-							<FormControl>
-								<Input placeholder="(123) 456-7890" {...field} />
-							</FormControl>
-							<FormMessage />
-						</FormItem>
-					)}
-				/>
-				<FormField
-					control={form.control}
-					name="password"
-					render={({ field }) => (
-						<FormItem>
-							<FormLabel>Password</FormLabel>
-							<FormControl>
-								<Input type="password" {...field} />
-							</FormControl>
-							<FormMessage />
-						</FormItem>
-					)}
-				/>
+					{error && <p className="pt-2 text-sm text-red-500">{error}</p>}
 
-				{error && <p className="text-sm text-red-500">{error}</p>}
-
-				<Button type="submit" className="w-full">
-					Create Account
-				</Button>
-
-				<p className="text-muted-foreground text-center text-sm">
-					Already have an account?{" "}
-					<button
-						type="button"
-						onClick={onSwitchToLogin}
-						className="text-primary font-semibold underline-offset-4 hover:underline"
+					<Button
+						type="submit"
+						className="h-12 w-full bg-blue-600 text-base font-semibold hover:bg-blue-700"
+						disabled={isLoading}
 					>
-						Login
-					</button>
-				</p>
-			</form>
-		</Form>
+						{isLoading ? "Creating account..." : "Sign up"}
+					</Button>
+
+					<p className="pt-2 text-center text-sm text-gray-600">
+						Already have an account?
+						<button
+							type="button"
+							onClick={onSwitchToLogin}
+							className="font-semibold text-blue-600 hover:text-blue-500"
+						>
+							Sign in
+						</button>
+					</p>
+				</form>
+			</Form>
+		</div>
 	);
 }
