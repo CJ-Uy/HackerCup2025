@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { AiOutlineHome, AiOutlinePlus } from "react-icons/ai";
 import { HiOutlineViewGrid } from "react-icons/hi";
