@@ -1,0 +1,122 @@
+model Posting {
+    id        String   @id @default(uuid()) @db.Uuid
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    title       String
+    description String
+    status      PostStatus @default(WAITING_FOR_BIDS)
+
+    latitude  Float
+    longitude Float
+    address   String? // For display purposes
+
+    author   UserProfile @relation(fields: [authorId], references: [id], onDelete: Cascade)
+    authorId String      @db.Uuid
+
+    media Media[]
+    bids  Bid[]
+
+    // When a bid is accepted, we store its ID here for easy access.
+    // This marks the "matched" partner.
+    acceptedBid   Bid?    @relation("AcceptedBid", fields: [acceptedBidId], references: [id], onDelete: SetNull)
+    acceptedBidId String? @unique @db.Uuid
+
+    // After a posting is completed, it can have one review.
+    review Review?
+
+    tags PostingTag[]
+}
+
+/**
+ * Represents a single uploaded image or video file.
+ * This is the recommended way to handle multiple file uploads for an entity.
+ */
+model Media {
+    id        String    @id @default(uuid()) @db.Uuid
+    url       String // The URL from your file storage (e.g., S3, Cloudinary)
+    mediaType MediaType
+    order     Int // To maintain the display order of images/videos
+
+    posting   Posting @relation(fields: [postingId], references: [id], onDelete: Cascade)
+    postingId String  @db.Uuid
+
+    @@map("media")
+}
+
+/**
+ * This model represents a partner's bid on a specific posting.
+ * I've renamed it from "PartnerToPosting" for clarity.
+ */
+model Bid {
+    id String @id @default(uuid()) @db.Uuid
+
+    partner          PartnerProfile @relation(fields: [partnerProfileId], references: [id], onDelete: Cascade)
+    partnerProfileId String         @db.Uuid
+
+    posting   Posting @relation(fields: [postingId], references: [id], onDelete: Cascade)
+    postingId String  @db.Uuid
+
+    // Fields specific to the bid
+    amount  Float // The monetary value of the bid
+    message String? // An optional message from the partner
+    status  BidStatus @default(ACTIVE)
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    // This is the back-relation to the `acceptedBidId` on the Posting model.
+    // It allows you to query from the Bid to see if it was the one accepted for a Posting.
+    acceptedForPosting Posting? @relation("AcceptedBid")
+
+    // A partner can only bid once on a single posting.
+    @@unique([partnerProfileId, postingId])
+    @@map("bids")
+}
+
+/**
+ * A much cleaner model for reviews and ratings.
+ * A review is created AFTER a posting is completed.
+ * It connects the user, the partner, and the posting context.
+ */
+model Review {
+    id String @id @default(uuid()) @db.Uuid
+
+    rating  Float // e.g., 1 to 5 stars
+    comment String?
+
+    // The UserProfile who WROTE the review.
+    reviewer   UserProfile @relation("Reviewer", fields: [reviewerId], references: [id], onDelete: Cascade)
+    reviewerId String      @db.Uuid
+
+    // The PartnerProfile who is BEING reviewed.
+    reviewedPartner   PartnerProfile @relation("ReviewedPartner", fields: [reviewedPartnerId], references: [id], onDelete: Cascade)
+    reviewedPartnerId String         @db.Uuid
+
+    // The review is for a specific posting. A posting can only have one review.
+    posting   Posting @relation(fields: [postingId], references: [id], onDelete: Cascade)
+    postingId String  @unique @db.Uuid
+
+    createdAt DateTime @default(now())
+
+    @@map("reviews")
+}
+
+/**
+ * A model for storing notifications for users.
+ * These are created when important events happen.
+ */
+model Notification {
+    id      String           @id @default(uuid()) @db.Uuid
+    type    NotificationType
+    message String
+    isRead  Boolean          @default(false)
+    linkUrl String? // Optional URL to navigate to (e.g., /postings/123)
+
+    recipient   UserProfile @relation(fields: [recipientId], references: [id], onDelete: Cascade)
+    recipientId String      @db.Uuid
+
+    createdAt DateTime @default(now())
+
+    @@map("notifications")
+}

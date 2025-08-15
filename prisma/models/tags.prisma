@@ -1,0 +1,30 @@
+/**
+ * Central table for all tags. A tag can be a skill,
+ * an occupation, or a category for a post. The 'type'
+ * field helps differentiate them.
+ */
+model Tag {
+  id   String  @id @default(uuid()) @db.Uuid
+  name String  @unique // e.g., "Plumbing", "Electrician", "Home Repair"
+  type TagType
+
+  postings PartnerSkill[]
+  partners PostingTag[]
+
+  @@map("tags")
+}
+
+/**
+ * Join table for a many-to-many relationship
+ * between Postings and Tags.
+ */
+model PostingTag {
+  posting   Posting @relation(fields: [postingId], references: [id], onDelete: Cascade)
+  postingId String  @db.Uuid
+
+  tag   Tag    @relation(fields: [tagId], references: [id], onDelete: Cascade)
+  tagId String @db.Uuid
+
+  @@id([postingId, tagId])
+  @@map("posting_tags")
+}
