@@ -75,9 +75,7 @@ export function PartnerOnboarding() {
 					partner_profile_id: partnerProfile.id,
 					tag_id: skill.id,
 				}));
-				const { error: skillsError } = await supabase
-					.from("partner_skills")
-					.insert(skillsToInsert);
+				const { error: skillsError } = await supabase.from("partner_skills").insert(skillsToInsert);
 				if (skillsError) throw skillsError;
 			}
 

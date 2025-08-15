@@ -32,13 +32,13 @@ export default async function Profile() {
 		.from("user_profiles")
 		.select(
 			`
-      id,
-      email,
-      firstName,
-      lastName,
-      phone,
-      profilePictureUrl
-    `,
+			id,
+			email,
+			firstName,
+			lastName,
+			phone,
+			profilePictureUrl
+			`,
 		)
 		.eq("id", user.id)
 		.single();

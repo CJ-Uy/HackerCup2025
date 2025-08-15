@@ -1,5 +1,3 @@
 export default function Activity() {
-	return (
-		<h1>Activity</h1>
-	)
+	return <h1>Activity</h1>;
 }

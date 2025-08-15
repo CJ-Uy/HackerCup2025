@@ -1,15 +1,15 @@
-import React from 'react';
+import React from "react";
 import NotificationCard from "@/components/NotificationCard";
 
 const Page = () => {
-    return (
-        <div>
-            <h1 className="text-2xl font-semibold mb-5">Notifications</h1>
+	return (
+		<div>
+			<h1 className="mb-5 text-2xl font-semibold">Notifications</h1>
 
-            {/*Sample Notifications*/}
-            <NotificationCard />
-        </div>
-    );
+			{/*Sample Notifications*/}
+			<NotificationCard />
+		</div>
+	);
 };
 
 export default Page;
