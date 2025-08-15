@@ -18,11 +18,14 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 
+// 1. UPDATE ZOD SCHEMA - Phone is no longer optional
 const formSchema = z.object({
 	firstName: z.string().min(1, "First name is required."),
 	lastName: z.string().min(1, "Last name is required."),
 	email: z.string().email("Please enter a valid email."),
 	password: z.string().min(6, "Password must be at least 6 characters."),
+	// Remove .optional() and add a validation message
+	phone: z.string().min(1, "Phone number is required."),
 });
 
 interface SignUpFormProps {
@@ -43,9 +46,12 @@ export function SignUpForm({ onSuccess, onSwitchToLogin }: SignUpFormProps) {
 			lastName: "",
 			email: "",
 			password: "",
+			phone: "",
 		},
 	});
 
+	// No changes needed in the onSubmit function.
+	// It already sends the phone number correctly.
 	async function onSubmit(values: z.infer<typeof formSchema>) {
 		setIsLoading(true);
 		setError(null);
@@ -57,6 +63,7 @@ export function SignUpForm({ onSuccess, onSwitchToLogin }: SignUpFormProps) {
 				data: {
 					first_name: values.firstName,
 					last_name: values.lastName,
+					phone: values.phone,
 				},
 			},
 		});
@@ -67,14 +74,12 @@ export function SignUpForm({ onSuccess, onSwitchToLogin }: SignUpFormProps) {
 			return;
 		}
 
-		// A better UX would be to show a "Check your email" message
 		form.reset();
 		onSuccess();
 	}
 
 	return (
 		<div className="w-full max-w-sm">
-			{/* Header */}
 			<div className="mb-8 text-center">
 				<h1 className="mb-2 text-4xl font-extrabold text-gray-900">KLUTCH</h1>
 				<p className="text-lg text-gray-600">Create your free account</p>
@@ -124,6 +129,22 @@ export function SignUpForm({ onSuccess, onSwitchToLogin }: SignUpFormProps) {
 							</FormItem>
 						)}
 					/>
+
+					<FormField
+						control={form.control}
+						name="phone"
+						render={({ field }) => (
+							<FormItem>
+								{/* 2. UPDATE UI - Remove "(Optional)" from the label */}
+								<FormLabel className="font-semibold">Phone Number</FormLabel>
+								<FormControl>
+									<Input type="tel" placeholder="(123) 456-7890" {...field} className="h-11" />
+								</FormControl>
+								<FormMessage />
+							</FormItem>
+						)}
+					/>
+
 					<FormField
 						control={form.control}
 						name="password"
@@ -171,7 +192,7 @@ export function SignUpForm({ onSuccess, onSwitchToLogin }: SignUpFormProps) {
 						<button
 							type="button"
 							onClick={onSwitchToLogin}
-							className="font-semibold text-blue-600 hover:text-blue-500"
+							className="ml-1 font-semibold text-blue-600 hover:text-blue-500"
 						>
 							Sign in
 						</button>

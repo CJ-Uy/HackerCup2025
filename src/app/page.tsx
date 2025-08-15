@@ -1,63 +1,84 @@
-"use client"
+"use client";
 
 import JobTitles from "@/components/JobTitles";
-import {Button} from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import { FaArrowRight } from "react-icons/fa6";
 import { useState } from "react";
 import { CiSearch } from "react-icons/ci";
 import { FaMapMarkerAlt } from "react-icons/fa";
+import { createClient } from "@/lib/supabase/client";
+import { useRouter } from "next/navigation";
+import { AuthModal } from "@/components/auth/AuthModal";
 
 export default function Home() {
-    const [searchQuery, setSearchQuery] = useState("");
+	const [searchQuery, setSearchQuery] = useState("");
+	const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+	const router = useRouter();
 
-    const handleSearch = (e) => {
-        e.preventDefault();
+	const handleSearch = (e) => {
+		e.preventDefault();
 
-        console.log("Searching for:", searchQuery);
-    };
+		console.log("Searching for:", searchQuery);
+	};
 
-    return (
-        <div>
-            <div className="flex justify-between items-center">
-                <h1 className="text-xl font-semibold">KLUTCH</h1>
-                <Button
-                    variant="outline"
-                    className="font-semibold border"
-                >
-                    Become a Partner <FaArrowRight className="size-3 mt-0.5"/>
-                </Button>
-            </div>
+	const handleBecomePartnerClick = async () => {
+		const supabase = createClient();
+		const {
+			data: { session },
+		} = await supabase.auth.getSession();
 
-            <div className="py-5 flex items-center justify-between gap-2">
-                <form onSubmit={handleSearch} className="w-full">
-                    <div className="relative">
-                        <CiSearch className="absolute left-4 top-1/2 transform -translate-y-1/2 text-[#1B365D]/50 size-5" />
-                        <input
-                            type="text"
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                            placeholder="What do you need?"
-                            className="w-full pl-12 pr-4 py-3 rounded-full border border-[#1B365D]/50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent  placeholder-[#1B365D]/50 text-sm"
-                        />
-                    </div>
-                </form>
+		if (session) {
+			router.push("/partner-dashboard");
+		} else {
+			setIsAuthModalOpen(true);
+		}
+	};
 
-                <div className="border p-3 rounded-full border-[#1B365D]/50">
-                    <FaMapMarkerAlt className="size-6" color="#1B365D"/>
-                </div>
-            </div>
+	return (
+		<div>
+			<div className="flex items-center justify-between">
+				<h1 className="text-xl font-semibold">KLUTCH</h1>
+				<Button
+					onClick={handleBecomePartnerClick}
+					variant="outline"
+					className="border font-semibold"
+				>
+					Become a Partner <FaArrowRight className="mt-0.5 size-3" />
+				</Button>
+			</div>
 
-            <JobTitles />
+			<div className="flex items-center justify-between gap-2 py-5">
+				<form onSubmit={handleSearch} className="w-full">
+					<div className="relative">
+						<CiSearch className="absolute top-1/2 left-4 size-5 -translate-y-1/2 transform text-[#1B365D]/50" />
+						<input
+							type="text"
+							value={searchQuery}
+							onChange={(e) => setSearchQuery(e.target.value)}
+							placeholder="What do you need?"
+							className="w-full rounded-full border border-[#1B365D]/50 py-3 pr-4 pl-12 text-sm placeholder-[#1B365D]/50 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none"
+						/>
+					</div>
+				</form>
 
-            <div className="mt-8 flex flex-col gap-3">
-                <h1 className="text-xl">Recently Viewed</h1>
-                <div className="bg-rose-500 w-full h-[200px]"></div>
-            </div>
+				<div className="rounded-full border border-[#1B365D]/50 p-3">
+					<FaMapMarkerAlt className="size-6" color="#1B365D" />
+				</div>
+			</div>
 
-            <div className="mt-8 flex flex-col gap-3">
-                <h1 className="text-xl">Favorites</h1>
-                <div className="bg-rose-500 w-full h-[200px]"></div>
-            </div>
-        </div>
-    );
+			<JobTitles />
+
+			<div className="mt-8 flex flex-col gap-3">
+				<h1 className="text-xl">Recently Viewed</h1>
+				<div className="h-[200px] w-full bg-rose-500"></div>
+			</div>
+
+			<div className="mt-8 flex flex-col gap-3">
+				<h1 className="text-xl">Favorites</h1>
+				<div className="h-[200px] w-full bg-rose-500"></div>
+			</div>
+
+			<AuthModal open={isAuthModalOpen} onOpenChange={setIsAuthModalOpen} />
+		</div>
+	);
 }
