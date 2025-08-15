@@ -27,7 +27,7 @@ export default function Navbar() {
     }, []);
 
     // Pages where navbar should be hidden
-    const hiddenRoutes = ['/signup', '/login', '/auth/signup', '/auth/login'];
+    const hiddenRoutes = ['/signup', '/login', '/auth/signup', '/auth/login', 'create'];
 
     // Check if current route should hide navbar
     const shouldHideNavbar = hiddenRoutes.includes(currentPath);
