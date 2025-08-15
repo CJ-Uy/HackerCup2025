@@ -107,7 +107,7 @@ export default function Navbar() {
 			{/* Plus Button (Center) */}
 			<button
 				onClick={() => router.push("/new-posting")}
-				className="rounded-full bg-[#1B365D] p-3 shadow-sm transition-colors hover:bg-gray-50"
+				className="rounded-full bg-[#1B365D] p-3 shadow-sm transition-colors hover:bg-[#1B365D]/80"
 			>
 				<AiOutlinePlus className="h-6 w-6" color="#fff" />
 			</button>
