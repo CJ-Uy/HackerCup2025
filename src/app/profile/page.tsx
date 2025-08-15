@@ -1,4 +1,3 @@
-// app/profile/page.tsx
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { ProfilePage } from "@/components/profiles/ProfilePage";
