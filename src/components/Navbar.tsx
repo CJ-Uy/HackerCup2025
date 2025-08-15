@@ -28,13 +28,13 @@ export default function Navbar() {
 
 			{/* Profile Picture */}
 			<button className="transition-opacity hover:opacity-80">
-				<Image
-					// src=""
+				{/* <Image
+					src=""
 					width={10}
 					height={10}
 					alt="Profile"
 					className="h-8 w-8 rounded-full border-2 border-gray-200 object-cover"
-				/>
+				/> */}
 			</button>
 		</nav>
 	);

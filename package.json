@@ -11,7 +11,7 @@
 		"start": "next start",
 		"lint": "next lint",
 		"format": "prettier --write \"./**/*.{js,jsx,mjs,cjs,ts,tsx,json}\"",
-		"db:setup": "prisma migrate dev && tsx ./src/lib/sqlScripts/seedTriggers.ts && tsx ./src/lib/sqlScripts/grantPrivileges",
+		"db:scripts": "tsx ./src/lib/supabase/sqlDevScripts/seedTrigger.ts && tsx ./src/lib/supabase/sqlDevScripts/grantPrismaPrivileges",
 		"db:migrate": "prisma migrate dev && tsx ./src/lib/sqlScripts/grantPrivileges",
 		"db:generate": "prisma generate"
 	},

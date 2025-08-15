@@ -18,9 +18,13 @@ import {
 import { Input } from "@/components/ui/input";
 
 const formSchema = z.object({
+	firstName: z.string().min(2, "First name must be at least 2 characters."),
+	lastName: z.string().min(2, "Last name must be at least 2 characters."),
 	username: z.string().min(2, "Username must be at least 2 characters."),
 	email: z.string().email("Please enter a valid email."),
 	password: z.string().min(6, "Password must be at least 6 characters."),
+	// Making phone optional as per your Prisma schema
+	phone: z.string().optional().or(z.literal("")),
 });
 
 interface SignUpFormProps {
@@ -35,21 +39,28 @@ export function SignUpForm({ onSuccess, onSwitchToLogin }: SignUpFormProps) {
 	const form = useForm<z.infer<typeof formSchema>>({
 		resolver: zodResolver(formSchema),
 		defaultValues: {
+			firstName: "",
+			lastName: "",
 			username: "",
 			email: "",
 			password: "",
+			phone: "",
 		},
 	});
 
 	async function onSubmit(values: z.infer<typeof formSchema>) {
 		setError(null);
+
+		// Pass additional data to the `options.data` property
 		const { data, error } = await supabase.auth.signUp({
 			email: values.email,
 			password: values.password,
 			options: {
-				// You can pass user metadata here
 				data: {
+					first_name: values.firstName, // Use snake_case for custom metadata
+					last_name: values.lastName,
 					username: values.username,
+					phone: values.phone,
 				},
 			},
 		});
@@ -59,17 +70,42 @@ export function SignUpForm({ onSuccess, onSwitchToLogin }: SignUpFormProps) {
 			return;
 		}
 
-		// After sign-up, Supabase automatically signs the user in.
-		// The onAuthStateChange listener will handle the session update.
-		// We just close the modal.
-		// If you have email confirmation enabled, the user is created but session is null until confirmed.
 		form.reset();
-		onSuccess();
+		onSuccess(); // Close modal on success
 	}
 
 	return (
 		<Form {...form}>
-			<form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+			<form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+				<div className="grid grid-cols-2 gap-4">
+					<FormField
+						control={form.control}
+						name="firstName"
+						render={({ field }) => (
+							<FormItem>
+								<FormLabel>First Name</FormLabel>
+								<FormControl>
+									<Input placeholder="John" {...field} />
+								</FormControl>
+								<FormMessage />
+							</FormItem>
+						)}
+					/>
+					<FormField
+						control={form.control}
+						name="lastName"
+						render={({ field }) => (
+							<FormItem>
+								<FormLabel>Last Name</FormLabel>
+								<FormControl>
+									<Input placeholder="Doe" {...field} />
+								</FormControl>
+								<FormMessage />
+							</FormItem>
+						)}
+					/>
+				</div>
+
 				<FormField
 					control={form.control}
 					name="username"
@@ -91,6 +127,19 @@ export function SignUpForm({ onSuccess, onSwitchToLogin }: SignUpFormProps) {
 							<FormLabel>Email</FormLabel>
 							<FormControl>
 								<Input placeholder="you@example.com" {...field} />
+							</FormControl>
+							<FormMessage />
+						</FormItem>
+					)}
+				/>
+				<FormField
+					control={form.control}
+					name="phone"
+					render={({ field }) => (
+						<FormItem>
+							<FormLabel>Phone (Optional)</FormLabel>
+							<FormControl>
+								<Input placeholder="(123) 456-7890" {...field} />
 							</FormControl>
 							<FormMessage />
 						</FormItem>
