@@ -8,22 +8,22 @@ export default function Navbar() {
         <nav className="fixed bottom-0 left-0 right-0 flex items-center justify-between px-6 py-4 bg-white border-t border-gray-100 z-50">
             {/* Home Icon */}
             <button className="p-2 hover:bg-gray-50 rounded-lg transition-colors">
-                <AiOutlineHome className="w-7 h-7 text-gray-800" />
+                <AiOutlineHome className="w-7 h-7" color="#1B365D" />
             </button>
 
             {/* Grid/Menu Icon */}
             <button className="p-2 hover:bg-gray-50 rounded-lg transition-colors">
-                <HiOutlineViewGrid className="w-7 h-7 text-gray-800" />
+                <HiOutlineViewGrid className="w-7 h-7" color="#1B365D" />
             </button>
 
             {/* Plus Button (Center) */}
-            <button className="bg-black text-white rounded-full p-3 hover:bg-gray-800 transition-colors shadow-sm">
-                <AiOutlinePlus className="w-6 h-6" />
+            <button className="bg-[#1B365D] rounded-full p-3 hover:bg-gray-800 transition-colors shadow-sm">
+                <AiOutlinePlus className="w-6 h-6" color="#fff"/>
             </button>
 
             {/* Notification Icon */}
             <button className="p-2 hover:bg-gray-50 rounded-lg transition-colors relative">
-                <BellDot className="w-7 h-7 text-gray-800" />
+                <BellDot className="w-7 h-7" color="#1B365D" />
             </button>
 
             {/* Profile Picture */}
