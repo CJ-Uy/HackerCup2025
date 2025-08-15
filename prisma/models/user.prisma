@@ -1,0 +1,91 @@
+model UserProfile {
+  id                String   @id @default(uuid()) @db.Uuid
+  username          String   @unique
+  email             String?  @unique
+  phone             String?
+  firstName         String?
+  lastName          String?
+  profilePictureUrl String?
+  bio               String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  partnerProfile   PartnerProfile?
+  favoritePartners UsersToFavorites[]
+
+  postings     Posting[]
+  reviewsGiven Review[]  @relation("Reviewer")
+
+  notifications Notification[]
+
+  @@map("user_profiles")
+}
+
+model PartnerProfile {
+  id        String   @id @default(uuid()) @db.Uuid
+  nickname  String?
+  bio       String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  skills          PartnerSkill[]
+  certifications  Certification[]
+  latitude        Float?
+  longitude       Float?
+  address         String? // For display purposes
+  serviceRadiusKm Int?
+
+  userProfile   UserProfile @relation(fields: [userProfileId], references: [id], onDelete: Cascade)
+  userProfileId String      @unique @db.Uuid
+
+  favoredBy       UsersToFavorites[]
+  reviewsReceived Review[]           @relation("ReviewedPartner")
+  bids            Bid[]
+
+  @@map("partner_profiles")
+}
+
+model UsersToFavorites {
+  userProfile      UserProfile    @relation(fields: [userProfileId], references: [id], onDelete: Cascade)
+  partnerProfile   PartnerProfile @relation(fields: [partnerProfileId], references: [id], onDelete: Cascade)
+  userProfileId    String         @db.Uuid
+  partnerProfileId String         @db.Uuid
+
+  createdAt DateTime @default(now())
+
+  @@id([userProfileId, partnerProfileId])
+  @@map("users_to_favorites")
+}
+
+/**
+ * A dedicated model for partner qualifications.
+ * A partner can upload multiple documents/images.
+ */
+model Certification {
+  id          String    @id @default(uuid()) @db.Uuid
+  title       String // e.g., "Master Plumber License"
+  issuingBody String? // e.g., "State Licensing Board"
+  fileUrl     String // URL to the uploaded PDF/image
+  validUntil  DateTime? // Optional expiry date
+  createdAt   DateTime  @default(now())
+
+  partnerProfile   PartnerProfile @relation(fields: [partnerProfileId], references: [id], onDelete: Cascade)
+  partnerProfileId String         @db.Uuid
+
+  @@map("certifications")
+}
+
+/**
+ * Join table for a many-to-many relationship
+ * between PartnerProfiles and Tags (for their skills/occupations).
+ */
+model PartnerSkill {
+  partnerProfile   PartnerProfile @relation(fields: [partnerProfileId], references: [id], onDelete: Cascade)
+  partnerProfileId String         @db.Uuid
+
+  tag   Tag    @relation(fields: [tagId], references: [id], onDelete: Cascade)
+  tagId String @db.Uuid
+
+  @@id([partnerProfileId, tagId])
+  @@map("partner_skills")
+}

@@ -1,7 +1,7 @@
 import { AiOutlineHome, AiOutlinePlus } from "react-icons/ai";
 import { HiOutlineViewGrid } from "react-icons/hi";
 import Image from "next/image";
-import { BellDot } from 'lucide-react';
+import { BellDot } from "lucide-react";
 
 export default function Navbar() {
     return (
@@ -26,15 +26,17 @@ export default function Navbar() {
                 <BellDot className="w-7 h-7" color="#1B365D" />
             </button>
 
-            {/* Profile Picture */}
-            <button className="hover:opacity-80 transition-opacity">
-                <Image
-                    // src=""
-                    width={10} height={10}
-                    alt="Profile"
-                    className="w-8 h-8 rounded-full object-cover border-2 border-gray-200"
-                />
-            </button>
-        </nav>
-    );
+
+			{/* Profile Picture */}
+			<button className="transition-opacity hover:opacity-80">
+				<Image
+					// src=""
+					width={10}
+					height={10}
+					alt="Profile"
+					className="h-8 w-8 rounded-full border-2 border-gray-200 object-cover"
+				/>
+			</button>
+		</nav>
+	);
 }
