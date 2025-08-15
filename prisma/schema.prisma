@@ -42,17 +42,17 @@ enum MediaType {
 }
 
 enum BidStatus {
-  ACTIVE    // The bid is open for consideration
-  ACCEPTED  // The customer has chosen this bid
-  DECLINED  // The customer chose another bid
+  ACTIVE // The bid is open for consideration
+  ACCEPTED // The customer has chosen this bid
+  DECLINED // The customer chose another bid
   WITHDRAWN // The partner cancelled their own bid
 }
 
 // To differentiate tag purposes
-enum TagType { 
+enum TagType {
   SKILL
   OCCUPATION
-  CATEGORY 
+  CATEGORY
 }
 
 enum NotificationType {

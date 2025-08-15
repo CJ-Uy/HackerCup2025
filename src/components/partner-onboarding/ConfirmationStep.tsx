@@ -7,7 +7,7 @@ export function ConfirmationStep() {
 		<div className="flex flex-col items-center justify-center space-y-6 py-12 text-center">
 			<CheckCircle className="h-16 w-16 text-green-500" />
 			<div className="space-y-2">
-				<h2 className="text-3xl font-bold">You're All Set!</h2>
+				<h2 className="text-3xl font-bold">You&apos;re All Set!</h2>
 				<p className="text-muted-foreground max-w-sm">
 					Your partner profile has been created. You will now appear in searches and can start
 					bidding on jobs.

@@ -10,6 +10,7 @@ import { Step4_Certifications } from "./Step4_Certifications";
 import { ConfirmationStep } from "./ConfirmationStep";
 import { createClient } from "@/lib/supabase/client";
 import { toast } from "sonner";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 const TOTAL_STEPS = 4;
 
@@ -18,8 +19,8 @@ const initialData: OnboardingFormData = {
 	bio: "",
 	skills: [],
 	address: "",
-	latitude: null, // Should be set by a real address API
-	longitude: null, // Should be set by a real address API
+	latitude: 14.566478865486728, // Should be set by a real address API
+	longitude: 120.99291085232736, // Should be set by a real address API
 	serviceRadiusKm: 10,
 	certifications: [],
 };
@@ -27,6 +28,7 @@ const initialData: OnboardingFormData = {
 export function PartnerOnboarding() {
 	const [currentStep, setCurrentStep] = useState(1);
 	const [formData, setFormData] = useState<OnboardingFormData>(initialData);
+	const [submittedData, setSubmittedData] = useState<OnboardingFormData | null>(null);
 	const [isLoading, setIsLoading] = useState(false);
 	const supabase = createClient();
 
@@ -48,30 +50,36 @@ export function PartnerOnboarding() {
 
 		try {
 			// 2. Insert into partner_profiles
-			const { data: partnerProfile, error: partnerError } = await supabase
+			const { data: partnerProfiles, error: partnerError } = await supabase
 				.from("partner_profiles")
 				.insert({
-					user_profile_id: user.id,
+					userProfileId: user.id,
 					nickname: formData.nickname,
 					bio: formData.bio,
 					address: formData.address,
 					latitude: formData.latitude,
 					longitude: formData.longitude,
-					service_radius_km: formData.serviceRadiusKm,
+					serviceRadiusKm: formData.serviceRadiusKm,
 				})
-				.select()
-				.single();
+				.select();
 
 			if (partnerError) throw partnerError;
-			if (!partnerProfile) throw new Error("Failed to create partner profile.");
+			if (!partnerProfiles || partnerProfiles.length === 0) {
+				throw new Error("Failed to create partner profile.");
+			}
+			const partnerProfile = partnerProfiles[0];
 
 			// 3. Insert skills into partner_skills
-			const skillsToInsert = formData.skills.map((skill) => ({
-				partner_profile_id: partnerProfile.id,
-				tag_id: skill.id,
-			}));
-			const { error: skillsError } = await supabase.from("partner_skills").insert(skillsToInsert);
-			if (skillsError) throw skillsError;
+			if (formData.skills.length > 0) {
+				const skillsToInsert = formData.skills.map((skill) => ({
+					partner_profile_id: partnerProfile.id,
+					tag_id: skill.id,
+				}));
+				const { error: skillsError } = await supabase
+					.from("partner_skills")
+					.insert(skillsToInsert);
+				if (skillsError) throw skillsError;
+			}
 
 			// 4. Upload certifications to Storage and insert into certifications table
 			for (const cert of formData.certifications) {
@@ -97,15 +105,12 @@ export function PartnerOnboarding() {
 				if (certInsertError) throw certInsertError;
 			}
 
-			toast({ title: "Success!", description: "Your partner profile is live." });
+			toast("Success: Your partner profile is live.");
+			setSubmittedData(formData);
 			nextStep(); // Move to confirmation step
 		} catch (error: any) {
 			console.error("Onboarding submission error:", error);
-			toast({
-				title: "Submission Failed",
-				description: error.message || "Please try again.",
-				variant: "destructive",
-			});
+			toast(`Submission Failed: ${error.message}`);
 		} finally {
 			setIsLoading(false);
 		}
@@ -144,7 +149,36 @@ export function PartnerOnboarding() {
 					/>
 				);
 			case 5:
-				return <ConfirmationStep />;
+				return (
+					<div>
+						{submittedData && (
+							<Card className="mb-6">
+								<CardHeader>
+									<CardTitle>Submission Data</CardTitle>
+								</CardHeader>
+								<CardContent>
+									<pre className="bg-muted text-muted-foreground overflow-x-auto rounded-md p-4 text-sm">
+										{JSON.stringify(
+											submittedData,
+											(key, value) => {
+												if (value instanceof File) {
+													return {
+														name: value.name,
+														size: value.size,
+														type: value.type,
+													};
+												}
+												return value;
+											},
+											2,
+										)}
+									</pre>
+								</CardContent>
+							</Card>
+						)}
+						<ConfirmationStep />
+					</div>
+				);
 			default:
 				return null;
 		}
