@@ -15,16 +15,14 @@ import "dotenv/config";
 const dbUrl = process.env.DATABASE_URL;
 
 if (!dbUrl) {
-  throw new Error("Couldn't find db url. Please check your .env file.");
+	throw new Error("Couldn't find db url. Please check your .env file.");
 }
 const sql = postgres(dbUrl);
 
 async function main() {
-  console.log(
-    "Setting up database functions and triggers for user profile handling..."
-  );
+	console.log("Setting up database functions and triggers for user profile handling...");
 
-  await sql`
+	await sql`
     CREATE OR REPLACE FUNCTION public.handle_new_user()
     RETURNS TRIGGER AS $$
     BEGIN
@@ -52,25 +50,25 @@ async function main() {
     END;
     $$ LANGUAGE plpgsql SECURITY DEFINER;
   `;
-  console.log("-> Function `handle_new_user` created/updated.");
+	console.log("-> Function `handle_new_user` created/updated.");
 
-  await sql`
+	await sql`
     DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
   `;
-  console.log("-> Dropped existing trigger if it existed.");
+	console.log("-> Dropped existing trigger if it existed.");
 
-  await sql`
+	await sql`
     CREATE TRIGGER on_auth_user_created
       AFTER INSERT ON auth.users
       FOR EACH ROW EXECUTE PROCEDURE public.handle_new_user();
   `;
-  console.log("-> Trigger `on_auth_user_created` created.");
+	console.log("-> Trigger `on_auth_user_created` created.");
 
-  console.log("✅ Finished setting up database functions and triggers.");
-  process.exit();
+	console.log("✅ Finished setting up database functions and triggers.");
+	process.exit();
 }
 
 main().catch((err) => {
-  console.error("❌ An error occurred during script execution:", err);
-  process.exit(1);
+	console.error("❌ An error occurred during script execution:", err);
+	process.exit(1);
 });
