@@ -5,6 +5,7 @@ model Posting {
 
     title       String
     description String
+    budget      Float
     status      PostStatus @default(WAITING_FOR_BIDS)
 
     latitude  Float

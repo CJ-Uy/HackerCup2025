@@ -1,7 +1,6 @@
 export interface CreatePostingData {
     title: string;
     description: string;
-    budget: number;
     latitude: number;
     longitude: number;
     address?: string;

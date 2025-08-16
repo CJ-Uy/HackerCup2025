@@ -14,7 +14,6 @@ const PostForm = () => {
 	const [formData, setFormData] = useState({
 		title: "",
 		description: "",
-		budget: "",
 		media: null as File | null,
 		tags: "" as string,
 	});
@@ -57,7 +56,7 @@ const PostForm = () => {
 			setLocation(locationData);
 		} catch (error) {
 			setError("Unable to get your location. Please enable location services.");
-			console.error('Location error:', error);
+			console.error("Location error:", error);
 		} finally {
 			setIsGettingLocation(false);
 		}
@@ -80,19 +79,16 @@ const PostForm = () => {
 		setError(null);
 
 		try {
-			const budget = parseFloat(formData.budget);
-			if (isNaN(budget) || budget <= 0) {
-				throw new Error("Please enter a valid budget amount.");
-			}
-
 			const tags = formData.tags
-				? formData.tags.split(',').map(tag => tag.trim()).filter(Boolean)
+				? formData.tags
+						.split(",")
+						.map((tag) => tag.trim())
+						.filter(Boolean)
 				: [];
 
 			const postingData = {
 				title: formData.title,
 				description: formData.description,
-				budget,
 				latitude: location.latitude,
 				longitude: location.longitude,
 				address: location.address,
@@ -105,10 +101,8 @@ const PostForm = () => {
 
 			// Redirect to activity page
 			router.push("/activity");
-
 		} catch (error) {
-			const errorMessage = error instanceof Error ? error.message : "Failed to create posting. Please try again.";
-			setError(errorMessage);
+			router.push("/activity");
 		} finally {
 			setIsSubmitting(false);
 		}
@@ -151,8 +145,8 @@ const PostForm = () => {
 
 				{/* Error Message */}
 				{error && (
-					<div className="mb-6 rounded-lg bg-red-50 border border-red-200 p-4">
-						<p className="text-red-700 text-sm">{error}</p>
+					<div className="mb-6 rounded-lg border border-red-200 bg-red-50 p-4">
+						<p className="text-sm text-red-700">{error}</p>
 					</div>
 				)}
 
@@ -160,15 +154,14 @@ const PostForm = () => {
 				<form id="post-form" onSubmit={handleSubmit} className="space-y-6">
 					{/* Location */}
 					<div className="space-y-3">
-						<Label className="text-base font-medium text-gray-700">
-							Location *
-						</Label>
+						<Label className="text-base font-medium text-gray-700">Location *</Label>
 						{location ? (
 							<div className="flex items-center gap-2 rounded-lg border border-green-200 bg-green-50 px-4 py-3">
 								<MapPin className="h-4 w-4 text-green-600" />
 								<span className="text-sm text-green-700">
-                  {location.address || `${location.latitude.toFixed(4)}, ${location.longitude.toFixed(4)}`}
-                </span>
+									{location.address ||
+										`${location.latitude.toFixed(4)}, ${location.longitude.toFixed(4)}`}
+								</span>
 							</div>
 						) : (
 							<Button
@@ -238,7 +231,6 @@ const PostForm = () => {
 							required
 							min="1"
 							step="0.01"
-							value={formData.budget}
 							onChange={handleInputChange}
 							placeholder="500.00"
 							className="w-full rounded-lg border border-gray-200 bg-white px-4 py-3 text-gray-900 placeholder-gray-400 focus:border-transparent focus:ring-2 focus:ring-gray-200 focus:outline-none"
@@ -259,9 +251,7 @@ const PostForm = () => {
 							placeholder="cleaning, plumbing, repair (separate with commas)"
 							className="w-full rounded-lg border border-gray-200 bg-white px-4 py-3 text-gray-900 placeholder-gray-400 focus:border-transparent focus:ring-2 focus:ring-gray-200 focus:outline-none"
 						/>
-						<p className="text-xs text-gray-500">
-							Separate multiple tags with commas
-						</p>
+						<p className="text-xs text-gray-500">Separate multiple tags with commas</p>
 					</div>
 
 					{/* Media Upload */}
@@ -281,8 +271,8 @@ const PostForm = () => {
 							<Label htmlFor="media" className="flex cursor-pointer flex-col items-center gap-2">
 								<Plus className="h-8 w-8 text-gray-400" />
 								<span className="text-sm text-gray-600">
-                  {formData.media ? formData.media.name : "Click to upload image or video"}
-                </span>
+									{formData.media ? formData.media.name : "Click to upload image or video"}
+								</span>
 								<span className="text-xs text-gray-400">PNG, JPG, GIF, MP4 up to 10MB</span>
 							</Label>
 						</div>

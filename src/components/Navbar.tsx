@@ -12,7 +12,7 @@ import { useRouter } from "next/navigation";
 
 // Define a type for your user profile for type safety
 type UserProfile = {
-	image_url: string | null;
+	profilePictureUrl: string | null;
 	// Add other profile fields if you need them, e.g., username: string;
 };
 
@@ -55,7 +55,7 @@ export default function Navbar() {
 			if (session?.user) {
 				const { data, error } = await supabase
 					.from("user_profiles") // Your public profiles table
-					.select("image_url") // Select only the column you need
+					.select("profilePictureUrl") // Select only the column you need
 					.eq("id", session.user.id)
 					.single();
 
@@ -84,7 +84,7 @@ export default function Navbar() {
 
 	// 5. Determine the correct avatar URL
 	// Default to your placeholder SVG in the public folder
-	const avatarUrl = profile?.image_url || "/default-avatar.svg";
+	const avatarUrl = profile?.profilePictureUrl || "/default-avatar.svg";
 
 	return (
 		<nav className="fixed right-0 bottom-0 left-0 z-50 flex items-center justify-between border-t border-gray-100 bg-white px-6 py-4">
