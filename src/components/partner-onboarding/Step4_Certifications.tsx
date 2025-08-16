@@ -11,12 +11,13 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Plus, Trash2, FileText } from "lucide-react";
+import { Plus, Trash2, FileText, Loader2 } from "lucide-react"; // Import Loader2
 import { useState } from "react";
 import { CertificationData, OnboardingFormData } from "./types";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { format } from "date-fns";
+import { Textarea } from "@/components/ui/textarea";
 
 interface Props {
 	formData: OnboardingFormData;
@@ -88,6 +89,9 @@ export function Step4_Certifications({
 	isLoading,
 }: Props) {
 	const [open, setOpen] = useState(false);
+	const [isGeneratingKeywords, setIsGeneratingKeywords] = useState(false);
+	const [keywordsGenerated, setKeywordsGenerated] = useState(false);
+	const [generatedKeywords, setGeneratedKeywords] = useState("");
 
 	const removeCertification = (id: string) => {
 		setFormData((prev) => ({
@@ -99,6 +103,68 @@ export function Step4_Certifications({
 	const handleAdd = (cert: CertificationData) => {
 		setFormData((prev) => ({ ...prev, certifications: [...prev.certifications, cert] }));
 		setOpen(false);
+	};
+
+	const handleGenerateKeywords = async () => {
+		setIsGeneratingKeywords(true);
+		setKeywordsGenerated(false); // Reset on each generation attempt
+		setGeneratedKeywords("");
+
+		// Combine all relevant string data from the formData
+		const skillsText = formData.skills.map((skill) => skill.name).join(", ");
+		const certsText = formData.certifications.map((cert) => cert.title).join(", ");
+		const textToAnalyze = `
+            Nickname: ${formData.nickname}.
+            Bio: ${formData.bio}.
+            Offered Skills: ${skillsText}.
+            Address: ${formData.address}.
+            Certifications: ${certsText}.
+        `;
+
+		try {
+			const response = await fetch("/api/getKeyWords", {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				// The API expects an object with a 'text' property
+				body: JSON.stringify({ text: textToAnalyze }),
+			});
+
+			if (!response.ok) {
+				throw new Error(`API request failed with status ${response.status}`);
+			}
+
+			const data = await response.json();
+			// Combine keywords from all categories returned by the API
+			const allKeywords = [
+				...(data.primary_trade || []),
+				...(data.specific_services || []),
+				...(data.qualities || []),
+			];
+
+			// Ensure we only have unique keywords
+			const uniqueKeywords = [...new Set(allKeywords)];
+
+			if (uniqueKeywords.length > 0) {
+				const keywordsString = uniqueKeywords.join(", ");
+				setGeneratedKeywords(keywordsString);
+				// Optionally save the keywords back to the main form state
+				setFormData((prev) => ({ ...prev, aiTags: keywordsString }));
+				setKeywordsGenerated(true);
+			} else {
+				setGeneratedKeywords(
+					"No relevant keywords found. Try adding more detail to your bio or skills.",
+				);
+				setKeywordsGenerated(false);
+			}
+		} catch (error) {
+			console.error("Failed to generate keywords:", error);
+			setGeneratedKeywords("An error occurred while generating keywords. Please try again.");
+			setKeywordsGenerated(false);
+		} finally {
+			setIsGeneratingKeywords(false);
+		}
 	};
 
 	return (
@@ -156,11 +222,34 @@ export function Step4_Certifications({
 				</CardContent>
 			</Card>
 
+			<div className="grid w-full gap-1.5">
+				<Button onClick={handleGenerateKeywords} disabled={isGeneratingKeywords}>
+					{isGeneratingKeywords ? (
+						<>
+							<Loader2 className="mr-2 h-4 w-4 animate-spin" />
+							Generating...
+						</>
+					) : (
+						"Generate Keyword Tags"
+					)}
+				</Button>
+				<Textarea
+					id="ai-tags"
+					placeholder="Click 'Generate Keyword Tags' to create AI-powered search tags based on your profile."
+					value={generatedKeywords}
+					className="min-h-[120px]"
+					readOnly // Use readOnly to allow text selection but prevent user input
+				/>
+			</div>
+
 			<div className="flex justify-between">
-				<Button variant="outline" onClick={prevStep} disabled={isLoading}>
+				<Button variant="outline" onClick={prevStep} disabled={isLoading || isGeneratingKeywords}>
 					Back
 				</Button>
-				<Button onClick={handleSubmit} disabled={isLoading}>
+				<Button
+					onClick={handleSubmit}
+					disabled={isLoading || isGeneratingKeywords || !keywordsGenerated}
+				>
 					{isLoading ? "Submitting..." : "Finish & Submit"}
 				</Button>
 			</div>

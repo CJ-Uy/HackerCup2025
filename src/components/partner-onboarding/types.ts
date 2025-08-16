@@ -2,6 +2,7 @@
 export interface SkillTag {
 	id: string;
 	name: string;
+	category: string;
 }
 
 // Represents a certification being built in the form

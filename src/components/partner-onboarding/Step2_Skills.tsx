@@ -9,15 +9,45 @@ import { X } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useState } from "react";
 
-// In a real app, you would fetch these from your 'tags' table
 const MOCK_SKILLS: SkillTag[] = [
-	{ id: "1", name: "Plumber" },
-	{ id: "2", name: "Electrician" },
-	{ id: "3", name: "Carpenter" },
-	{ id: "4", name: "Painter" },
-	{ id: "5", name: "Landscaper" },
-];
+	// Home Repair & Maintenance
+	{ id: "1", name: "Plumber", category: "Home Repair" },
+	{ id: "2", name: "Electrician", category: "Home Repair" },
+	{ id: "3", name: "Carpenter", category: "Home Repair" },
+	{ id: "4", name: "Painter", category: "Home Repair" },
+	{ id: "5", name: "Handyman", category: "Home Repair" },
+	{ id: "6", name: "Appliance Repair", category: "Home Repair" },
+	{ id: "7", name: "HVAC Technician", category: "Home Repair" },
+	{ id: "8", name: "Locksmith", category: "Home Repair" },
 
+	// Cleaning & Organization
+	{ id: "9", name: "House Cleaner", category: "Cleaning" },
+	{ id: "10", name: "Deep Cleaner", category: "Cleaning" },
+	{ id: "11", name: "Window Washer", category: "Cleaning" },
+	{ id: "12", name: "Power Washer", category: "Cleaning" },
+	{ id: "13", name: "Professional Organizer", category: "Cleaning" },
+
+	// Moving & Labor
+	{ id: "14", name: "Mover", category: "Labor" },
+	{ id: "15", name: "Junk Removal", category: "Labor" },
+	{ id: "16", name: "Furniture Assembly", category: "Labor" },
+	{ id: "17", name: "General Labor", category: "Labor" },
+
+	// Outdoor & Landscaping
+	{ id: "18", name: "Landscaper", category: "Outdoor" },
+	{ id: "19", name: "Lawn Care", category: "Outdoor" },
+	{ id: "20", name: "Gardener", category: "Outdoor" },
+	{ id: "21", name: "Fence Repair", category: "Outdoor" },
+
+	// Tech & Electronics
+	{ id: "22", name: "IT Support", category: "Tech" },
+	{ id: "23", name: "Smart Home Installer", category: "Tech" },
+	{ id: "24", name: "Phone Repair", category: "Tech" },
+
+	// Automotive
+	{ id: "25", name: "Mobile Mechanic", category: "Automotive" },
+	{ id: "26", name: "Car Detailer", category: "Automotive" },
+];
 interface Props {
 	formData: OnboardingFormData;
 	setFormData: React.Dispatch<React.SetStateAction<OnboardingFormData>>;
