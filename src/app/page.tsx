@@ -1,5 +1,7 @@
 "use client";
 
+import Image from "next/image";
+import { ChevronRight } from "lucide-react";
 import JobTitles from "@/components/JobTitles";
 import { Button } from "@/components/ui/button";
 import { FaArrowRight } from "react-icons/fa6";
@@ -11,7 +13,121 @@ import { useRouter } from "next/navigation";
 import { AuthModal } from "@/components/auth/AuthModal";
 import { Session } from "@supabase/supabase-js"; // Optional: for type safety
 
-export default function Home() {
+const partners = [
+	{
+		id: 1,
+		name: "Juan Dela Cruz",
+		profession: "Plumber",
+		rating: 4.5,
+		location: "Quezon City",
+		imageUrl: "/plumber.jpg",
+	},
+	{
+		id: 2,
+		name: "Maria Santos",
+		profession: "Electrician",
+		rating: 4.8,
+		location: "Makati",
+		imageUrl: "/electrician.jpg",
+	},
+	{
+		id: 3,
+		name: "Pedro Reyes",
+		profession: "Tutor",
+		rating: 4.7,
+		location: "Pasig",
+		imageUrl: "/tutor.jpg",
+	},
+];
+
+const favoritePartners = [
+	{
+		id: 1,
+		name: "Carlos Garcia",
+		profession: "Carpenter",
+		rating: 4.9,
+		location: "Manila",
+		imageUrl: "/carpenter.jpg",
+		rate: "500/hr",
+	},
+	{
+		id: 2,
+		name: "Ana Lopez",
+		profession: "House Cleaner",
+		rating: 4.6,
+		location: "Taguig",
+		imageUrl: "/cleaner.jpg",
+		rate: "350/hr",
+	},
+];
+
+const PartnerCard = ({
+						 name,
+						 profession,
+						 rating,
+						 location,
+						 imageUrl,
+					 }: {
+	name: string;
+	profession: string;
+	rating: number;
+	location: string;
+	imageUrl: string;
+}) => {
+	return (
+		<div className="bg-white rounded-lg shadow-md p-3 flex gap-3">
+			<Image
+				src={imageUrl}
+				alt={name}
+				width={80}
+				height={80}
+				className="rounded-lg object-cover"
+			/>
+			<div>
+				<h3 className="font-semibold">{name}</h3>
+				<p className="text-sm text-gray-600">{profession}</p>
+				<p className="text-sm">⭐ {rating}</p>
+				<p className="text-xs text-gray-500">{location}</p>
+			</div>
+		</div>
+	);
+};
+
+const MinimalFavoriteCard = ({
+								 name,
+								 profession,
+								 rating,
+								 location,
+								 imageUrl,
+								 rate,
+							 }: {
+	name: string;
+	profession: string;
+	rating: number;
+	location: string;
+	imageUrl: string;
+	rate: string;
+}) => {
+	return (
+		<div className="bg-white rounded-lg shadow-md flex-shrink-0 w-40">
+			<Image
+				src={imageUrl}
+				alt={name}
+				width={150}
+				height={75}
+				className="rounded-t-lg object-cover w-full h-24"
+			/>
+			<div className="p-2">
+				<p className="text-sm font-medium truncate">{name}</p>
+				<p className="text-xs text-gray-500">{profession}</p>
+				<p className="font-semibold text-lg text-blue-600">₱{rate}</p>
+			</div>
+		</div>
+	);
+};
+
+export default function Page() {
+	const [search, setSearch] = useState("");
 	const [searchQuery, setSearchQuery] = useState("");
 	const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 	const router = useRouter();
@@ -42,14 +158,12 @@ export default function Home() {
 		console.log("Searching for:", searchQuery);
 	};
 
-	// We no longer need the old handleBecomePartnerClick function
-
 	return (
-		<div>
+		<div className="p-4 space-y-2">
 			<div className="flex items-center justify-between">
 				<h1 className="text-xl font-semibold">KLUTCH</h1>
 
-				{/* 4. Conditionally render the button based on the session state */}
+				{/* Conditionally render the button based on the session state */}
 				{isLoading ? (
 					// Show a disabled or placeholder button while checking auth
 					<Button variant="outline" className="border font-semibold" disabled>
@@ -97,17 +211,46 @@ export default function Home() {
 
 			<JobTitles />
 
-			<div className="mt-8 flex flex-col gap-3">
-				<h1 className="text-xl">Recently Viewed</h1>
-				<div className="h-[200px] w-full bg-rose-500"></div>
-			</div>
+			{/* Favorite Partners */}
+			<section>
+				<div className="flex justify-between items-center mb-2">
+					<h2 className="text-lg font-semibold">Your Favorites</h2>
+					<ChevronRight className="w-5 h-5 text-gray-500" />
+				</div>
+				<div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide -mx-1 px-1">
+					{favoritePartners.map((partner) => (
+						<MinimalFavoriteCard
+							key={partner.id}
+							name={partner.name}
+							profession={partner.profession}
+							rating={partner.rating}
+							location={partner.location}
+							imageUrl={partner.imageUrl}
+							rate={partner.rate} // ✅ now passing rate
+						/>
+					))}
+				</div>
+			</section>
 
-			<div className="mt-8 flex flex-col gap-3">
-				<h1 className="text-xl">Favorites</h1>
-				<div className="h-[200px] w-full bg-rose-500"></div>
-			</div>
-
-			<AuthModal open={isAuthModalOpen} onOpenChange={setIsAuthModalOpen} />
+			{/* Recently Viewed */}
+			<section className="mb-10">
+				<div className="flex justify-between items-center mb-2">
+					<h2 className="text-lg font-semibold">Recently Viewed</h2>
+					<ChevronRight className="w-5 h-5 text-gray-500" />
+				</div>
+				<div className="space-y-3">
+					{partners.map((partner) => (
+						<PartnerCard
+							key={partner.id}
+							name={partner.name}
+							profession={partner.profession}
+							rating={partner.rating}
+							location={partner.location}
+							imageUrl={partner.imageUrl}
+						/>
+					))}
+				</div>
+			</section>
 		</div>
 	);
 }
