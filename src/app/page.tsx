@@ -62,12 +62,12 @@ const favoritePartners = [
 ];
 
 const PartnerCard = ({
-						 name,
-						 profession,
-						 rating,
-						 location,
-						 imageUrl,
-					 }: {
+	name,
+	profession,
+	rating,
+	location,
+	imageUrl,
+}: {
 	name: string;
 	profession: string;
 	rating: number;
@@ -75,14 +75,8 @@ const PartnerCard = ({
 	imageUrl: string;
 }) => {
 	return (
-		<div className="bg-white rounded-lg shadow-md p-3 flex gap-3">
-			<Image
-				src={imageUrl}
-				alt={name}
-				width={80}
-				height={80}
-				className="rounded-lg object-cover"
-			/>
+		<div className="flex gap-3 rounded-lg bg-white p-3 shadow-md">
+			<Image src={imageUrl} alt={name} width={80} height={80} className="rounded-lg object-cover" />
 			<div>
 				<h3 className="font-semibold">{name}</h3>
 				<p className="text-sm text-gray-600">{profession}</p>
@@ -94,13 +88,13 @@ const PartnerCard = ({
 };
 
 const MinimalFavoriteCard = ({
-								 name,
-								 profession,
-								 rating,
-								 location,
-								 imageUrl,
-								 rate,
-							 }: {
+	name,
+	profession,
+	rating,
+	location,
+	imageUrl,
+	rate,
+}: {
 	name: string;
 	profession: string;
 	rating: number;
@@ -109,18 +103,18 @@ const MinimalFavoriteCard = ({
 	rate: string;
 }) => {
 	return (
-		<div className="bg-white rounded-lg shadow-md flex-shrink-0 w-40">
+		<div className="w-40 flex-shrink-0 rounded-lg bg-white shadow-md">
 			<Image
 				src={imageUrl}
 				alt={name}
 				width={150}
 				height={75}
-				className="rounded-t-lg object-cover w-full h-24"
+				className="h-24 w-full rounded-t-lg object-cover"
 			/>
 			<div className="p-2">
-				<p className="text-sm font-medium truncate">{name}</p>
+				<p className="truncate text-sm font-medium">{name}</p>
 				<p className="text-xs text-gray-500">{profession}</p>
-				<p className="font-semibold text-lg text-blue-600">₱{rate}</p>
+				<p className="text-lg font-semibold text-blue-600">₱{rate}</p>
 			</div>
 		</div>
 	);
@@ -159,9 +153,12 @@ export default function Page() {
 	};
 
 	return (
-		<div className="p-4 space-y-2">
+		<div className="space-y-2 p-4">
 			<div className="flex items-center justify-between">
-				<h1 className="text-xl font-semibold">KLUTCH</h1>
+				<div className="flex flex-row items-center gap-x-3">
+					<Image src="/logo.svg" width={50} height={50} alt="logo"></Image>
+					<h1 className="text-2xl font-semibold text-[#1B365D]">KLUTCH</h1>
+				</div>
 
 				{/* Conditionally render the button based on the session state */}
 				{isLoading ? (
@@ -213,11 +210,11 @@ export default function Page() {
 
 			{/* Favorite Partners */}
 			<section>
-				<div className="flex justify-between items-center mb-2">
+				<div className="mb-2 flex items-center justify-between">
 					<h2 className="text-lg font-semibold">Your Favorites</h2>
-					<ChevronRight className="w-5 h-5 text-gray-500" />
+					<ChevronRight className="h-5 w-5 text-gray-500" />
 				</div>
-				<div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide -mx-1 px-1">
+				<div className="scrollbar-hide -mx-1 flex gap-3 overflow-x-auto px-1 pb-2">
 					{favoritePartners.map((partner) => (
 						<MinimalFavoriteCard
 							key={partner.id}
@@ -234,9 +231,9 @@ export default function Page() {
 
 			{/* Recently Viewed */}
 			<section className="mb-10">
-				<div className="flex justify-between items-center mb-2">
+				<div className="mb-2 flex items-center justify-between">
 					<h2 className="text-lg font-semibold">Recently Viewed</h2>
-					<ChevronRight className="w-5 h-5 text-gray-500" />
+					<ChevronRight className="h-5 w-5 text-gray-500" />
 				</div>
 				<div className="space-y-3">
 					{partners.map((partner) => (
@@ -251,6 +248,8 @@ export default function Page() {
 					))}
 				</div>
 			</section>
+
+			<AuthModal open={isAuthModalOpen} onOpenChange={setIsAuthModalOpen} />
 		</div>
 	);
 }

@@ -24,7 +24,7 @@ export default async function Profile() {
 	} = await supabase.auth.getUser();
 
 	if (!user) {
-		redirect("/login"); // Or your auth page
+		redirect("/"); // Or your auth page
 	}
 
 	// --- QUERY 1: Fetch the user profile (guaranteed to exist for a logged-in user) ---

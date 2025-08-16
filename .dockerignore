@@ -1,0 +1,18 @@
+# Docker
+.dockerignore
+Dockerfile
+docker-compose.yml
+
+# Git
+.git
+.gitignore
+
+# Node
+node_modules
+.next
+npm-debug.log
+yarn-error.log
+
+# Editor
+.idea
+.vscode
