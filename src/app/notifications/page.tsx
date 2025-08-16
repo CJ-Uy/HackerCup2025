@@ -1,5 +1,5 @@
 import React from "react";
-import NotificationCard from "@/components/NotificationCard";
+import NotificationsCard from "@/components/NotificationsCard";
 
 const Page = () => {
 	return (
@@ -7,7 +7,7 @@ const Page = () => {
 			<h1 className="mb-5 text-2xl font-semibold">Notifications</h1>
 
 			{/*Sample Notifications*/}
-			<NotificationCard />
+			<NotificationsCard />
 		</div>
 	);
 };

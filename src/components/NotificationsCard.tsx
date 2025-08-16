@@ -261,9 +261,9 @@ const serviceRequests = [
     }
 ];
 
-const ActivityCard = () => {
-    // Function to get activity message based on status
-    const getActivityMessage = (status) => {
+const NotificationsCard = () => {
+    // Function to get notifications message based on status
+    const getNotificationsMessage = (status) => {
         switch (status) {
             case 'pending':
                 return 'A partner accepted your bid';
@@ -274,24 +274,24 @@ const ActivityCard = () => {
             case 'cancelled':
                 return 'Service request was cancelled';
             default:
-                return 'Activity update';
+                return 'Notifications update';
         }
     };
 
-    // Filter activities by time category
-    const recentActivities = serviceRequests.filter(req => req.timeCategory === 'recent');
-    const daysActivities = serviceRequests.filter(req => req.timeCategory === 'days');
-    const weeksActivities = serviceRequests.filter(req => req.timeCategory === 'weeks');
-    const monthsActivities = serviceRequests.filter(req => req.timeCategory === 'months');
+    // Filter notifications by time category
+    const recentNotifications = serviceRequests.filter(req => req.timeCategory === 'recent');
+    const daysNotifications = serviceRequests.filter(req => req.timeCategory === 'days');
+    const weeksNotifications = serviceRequests.filter(req => req.timeCategory === 'weeks');
+    const monthsNotifications = serviceRequests.filter(req => req.timeCategory === 'months');
 
-    // Component to render activity cards
-    const renderActivityCards = (activities) => (
+    // Component to render notifications cards
+    const renderNotificationsCards = (notifications) => (
         <div className="space-y-3 mb-6">
-            {activities.map((request) => (
+            {notifications.map((request) => (
                 <div key={request.id} className="flex flex-col gap-2 rounded-xl border-2 px-4 py-3">
-                    {/* Activity Header */}
+                    {/* Notifications Header */}
                     <div className="flex items-center justify-between">
-                        <h1 className="font-semibold">{getActivityMessage(request.status)}</h1>
+                        <h1 className="font-semibold">{getNotificationsMessage(request.status)}</h1>
                         <p className="text-sm whitespace-nowrap ml-5 opacity-50">{request.createdAt}</p>
                     </div>
 
@@ -311,38 +311,38 @@ const ActivityCard = () => {
     return (
         <div>
             {/* Recent Section (within 1 day) */}
-            {recentActivities.length > 0 && (
+            {recentNotifications.length > 0 && (
                 <div>
                     <h1 className="text-lg mb-2 font-semibold">Recent</h1>
-                    {renderActivityCards(recentActivities)}
+                    {renderNotificationsCards(recentNotifications)}
                 </div>
             )}
 
             {/* Days Section (1-6 days ago) */}
-            {daysActivities.length > 0 && (
+            {daysNotifications.length > 0 && (
                 <div>
                     <h1 className="text-lg mb-2 font-semibold">This Week</h1>
-                    {renderActivityCards(daysActivities)}
+                    {renderNotificationsCards(daysNotifications)}
                 </div>
             )}
 
             {/* Weeks Section (1-4 weeks ago) */}
-            {weeksActivities.length > 0 && (
+            {weeksNotifications.length > 0 && (
                 <div>
                     <h1 className="text-lg mb-2 font-semibold">Past Weeks</h1>
-                    {renderActivityCards(weeksActivities)}
+                    {renderNotificationsCards(weeksNotifications)}
                 </div>
             )}
 
             {/* Months Section (1+ months ago) */}
-            {monthsActivities.length > 0 && (
+            {monthsNotifications.length > 0 && (
                 <div>
                     <h1 className="text-lg mb-2 font-semibold">Past Months</h1>
-                    {renderActivityCards(monthsActivities)}
+                    {renderNotificationsCards(monthsNotifications)}
                 </div>
             )}
         </div>
     );
 };
 
-export default ActivityCard;
+export default NotificationsCard;
