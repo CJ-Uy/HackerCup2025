@@ -1,23 +1,45 @@
 // components/profile/ProfilePage.tsx
 "use client";
 
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { Settings, FileText, HelpCircle, LogOut, ArrowRight, UserCog } from "lucide-react";
+
+import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Toaster } from "@/components/ui/sonner";
+import type { FullUserProfile } from "@/app/profile/page";
+
 import { UserProfileTab } from "./UserProfileTab";
 import { PartnerProfileTab } from "./PartnerProfileTab";
 import { ProfileMenuItem } from "./ProfileMenuItem";
-import { Settings, FileText, HelpCircle, LogOut, ArrowRight, UserCog } from "lucide-react";
-import Link from "next/link";
-import { Toaster } from "@/components/ui/sonner";
-import type { FullUserProfile } from "@/app/profile/page";
 
 interface Props {
 	profile: FullUserProfile;
 }
 
 export function ProfilePage({ profile }: Props) {
+	const router = useRouter();
+	const supabase = createClient();
 	const userInitials = `${profile.firstName?.[0] || ""}${profile.lastName?.[0] || ""}`;
+
+	// --- NEW: Function to handle user logout ---
+	const handleLogout = async () => {
+		// Ask for confirmation before logging out
+		const { error } = await supabase.auth.signOut();
+
+		if (error) {
+			console.error("Error logging out:", error.message);
+			// You could show an error toast here if you like
+		} else {
+			// Redirect to the login page after successful logout
+			// router.refresh() helps clear any cached user data
+			router.push("/");
+			router.refresh();
+		}
+	};
 
 	return (
 		<div className="min-h-screen bg-gray-50">
@@ -77,7 +99,8 @@ export function ProfilePage({ profile }: Props) {
 
 			{/* Log Out Section */}
 			<div className="mt-4 bg-white">
-				<ProfileMenuItem icon={<LogOut size={20} />} label="Log Out" href="/logout" />
+				{/* --- MODIFIED: Changed from 'href' to 'onClick' --- */}
+				<ProfileMenuItem icon={<LogOut size={20} />} label="Log Out" onClick={handleLogout} />
 			</div>
 
 			<Toaster />

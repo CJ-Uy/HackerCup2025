@@ -1,22 +1,38 @@
-import { ChevronRight } from "lucide-react";
+// Example of a flexible ProfileMenuItem.tsx component
+
 import Link from "next/link";
+import { ChevronRight } from "lucide-react";
 
 interface Props {
 	icon: React.ReactNode;
 	label: string;
-	href: string;
+	href?: string;
+	onClick?: () => void;
 }
 
-export function ProfileMenuItem({ icon, label, href }: Props) {
+export function ProfileMenuItem({ icon, label, href, onClick }: Props) {
+	const content = (
+		<div className="flex items-center p-4">
+			<div className="text-gray-600">{icon}</div>
+			<span className="ml-4 flex-1 text-gray-800">{label}</span>
+			{/* Show chevron only for links, not for actions like logout */}
+			{href && <ChevronRight size={20} className="text-gray-400" />}
+		</div>
+	);
+
+	// If href is provided, render a Next.js Link
+	if (href) {
+		return (
+			<Link href={href} className="block cursor-pointer transition-colors hover:bg-gray-50">
+				{content}
+			</Link>
+		);
+	}
+
+	// Otherwise, render a button for the onClick action
 	return (
-		<Link href={href}>
-			<div className="flex cursor-pointer items-center justify-between p-4 hover:bg-gray-50">
-				<div className="flex items-center gap-4">
-					<span className="text-blue-600">{icon}</span>
-					<span className="font-medium text-gray-800">{label}</span>
-				</div>
-				<ChevronRight className="h-5 w-5 text-gray-400" />
-			</div>
-		</Link>
+		<button onClick={onClick} className="w-full text-left transition-colors hover:bg-gray-50">
+			{content}
+		</button>
 	);
 }
