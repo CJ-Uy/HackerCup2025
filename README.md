@@ -28,7 +28,11 @@ pnpm dev
 bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+
+- To run local LLM you must download OLLAMA then pass: ollama run phi4-mini
+- Use Cloudflare tunnels to expose default port 11434 to a domain
+- Use the new domain as the POST request url
 
 ## AI Use Declaration
 
