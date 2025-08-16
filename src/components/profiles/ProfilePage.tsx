@@ -38,7 +38,7 @@ export function ProfilePage({ profile }: Props) {
 
 				{/* Conditional "Become a Partner" or "Manage Partner Profile" Button */}
 				{!profile.partner_profiles ? (
-					<Link href="/partner/onboarding">
+					<Link href="/partner-onboarding">
 						<Button variant="outline" className="mt-4 w-full border-blue-300 bg-white/50">
 							Become a partner <ArrowRight className="ml-2 h-4 w-4" />
 						</Button>

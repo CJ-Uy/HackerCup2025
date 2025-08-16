@@ -39,7 +39,7 @@ export function PartnerProfileTab({ profile }: Props) {
 					Complete the onboarding process to manage your partner profile.
 				</CardDescription>
 				<Button asChild className="mt-4">
-					<Link href="/partner/onboarding">Become a Partner</Link>
+					<Link href="/partner-onboarding">Become a Partner</Link>
 				</Button>
 			</Card>
 		);
