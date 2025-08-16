@@ -56,7 +56,7 @@ export async function POST(req) {
 
 		// 3. Prepare the request payload for Ollama
 		const ollamaPayload = {
-			model: "phi3",
+			model: "phi4-mini",
 			messages: [
 				{
 					role: "user",
