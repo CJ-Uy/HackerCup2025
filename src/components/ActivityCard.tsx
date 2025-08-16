@@ -1,11 +1,11 @@
 // src/components/ActivityCard.tsx
 import React from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { Plug, Star } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 
-// Define the types for the data we expect.
-// This helps with TypeScript and auto-completion.
+// --- Type Definitions ---
 type UserProfile = {
 	firstName: string | null;
 	lastName: string | null;
@@ -30,9 +30,8 @@ export type Activity = {
 	  }
 );
 
-// A small helper component to render the star rating
-const StarRating = ({ rating }: { rating: number }) => {
-	const totalStars = 5;
+// --- Reusable Star Rating Component ---
+const StarRating = ({ rating, totalStars = 5 }: { rating: number; totalStars?: number }) => {
 	return (
 		<div className="flex items-center">
 			{[...Array(totalStars)].map((_, index) => {
@@ -41,7 +40,7 @@ const StarRating = ({ rating }: { rating: number }) => {
 					<Star
 						key={index}
 						className={`h-4 w-4 ${
-							starValue <= rating ? "fill-yellow-400 text-yellow-400" : "text-gray-300"
+							starValue <= Math.round(rating) ? "fill-yellow-400 text-yellow-400" : "text-gray-300"
 						}`}
 					/>
 				);
@@ -50,9 +49,11 @@ const StarRating = ({ rating }: { rating: number }) => {
 	);
 };
 
-// Card for 'Posting' type activities
+// --- Card for 'Posting' type activities ---
 const PostingCard = ({ activity }: { activity: Extract<Activity, { type: "posting" }> }) => {
-	return (
+	const isClickable = activity.status !== "Cancelled";
+
+	const cardContent = (
 		<div className="relative">
 			<div className="flex items-start gap-4">
 				<div className="mt-1 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-blue-50">
@@ -70,24 +71,32 @@ const PostingCard = ({ activity }: { activity: Extract<Activity, { type: "postin
 				</div>
 			</div>
 			{activity.status === "Cancelled" && (
-				<div className="absolute right-0 bottom-0">
-					<span className="font-semibold text-red-600">Cancelled</span>
+				<div className="absolute right-0 bottom-[-4px]">
+					<span className="text-sm font-semibold text-red-600">Cancelled</span>
 				</div>
 			)}
 		</div>
 	);
+
+	return isClickable ? (
+		<Link href={`/postings/${activity.id}`} className="block">
+			{cardContent}
+		</Link>
+	) : (
+		<div>{cardContent}</div>
+	);
 };
 
-// Card for 'Review' type activities
+// --- Card for 'Review' type activities ---
 const ReviewCard = ({ activity }: { activity: Extract<Activity, { type: "review" }> }) => {
 	return (
 		<div className="flex items-start gap-4">
 			<Image
-				src={activity.user.profilePictureUrl || "/default-avatar.png"} // Provide a path to a default avatar
+				src={activity.user.profilePictureUrl || "/default-avatar.png"}
 				alt="Profile picture"
 				width={40}
 				height={40}
-				className="rounded-full"
+				className="rounded-full object-cover"
 			/>
 			<div className="flex-1">
 				<h2 className="font-semibold text-gray-800">
@@ -103,9 +112,14 @@ const ReviewCard = ({ activity }: { activity: Extract<Activity, { type: "review"
 	);
 };
 
+// --- Main Activity Card Component ---
 const ActivityCard = ({ activity }: { activity: Activity }) => {
+	const isClickable = activity.type === "posting" && activity.status !== "Cancelled";
+
 	return (
-		<div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm transition-shadow hover:shadow-md">
+		<div
+			className={`rounded-xl border border-gray-200 bg-white p-4 shadow-sm transition-shadow ${isClickable ? "cursor-pointer hover:shadow-md" : "opacity-70"}`}
+		>
 			{activity.type === "posting" ? (
 				<PostingCard activity={activity} />
 			) : (
@@ -116,3 +130,4 @@ const ActivityCard = ({ activity }: { activity: Activity }) => {
 };
 
 export default ActivityCard;
+export { StarRating }; // Export for use in PartnerCard
